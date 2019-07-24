@@ -6,7 +6,6 @@ This file contains all the information for building the terminal field
 
 // terminal attributte
 const string terminal_attributes = "tcsetattr";
-struct termios TERMINAL;
 
 // Kill the program and display message
 void kill(const char *ch);
@@ -14,8 +13,11 @@ void kill(const char *ch);
 // Save the termios that was inputted
 void disablecho();
 
-//Each key typed is printed to the terminal
+// Each key typed is printed to the terminal
 void enablecho();
+
+// Obtains the size for the editor
+int editor_size();
 
 // Return and wait for keypress
 char read_editor();

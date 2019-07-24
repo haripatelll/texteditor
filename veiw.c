@@ -16,7 +16,7 @@ void esc_cursor()
 
 void row_chars() 
 {
-	int row_count = 15;
+	int row_count = editor.row;
 	for (int i = 0; i < row_count; i++)
 	{
 		write(STDOUT_FILENO, row_print, 3);

@@ -13,18 +13,18 @@ void kill(const char *ch)
 
 void disablecho() 
 {
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &TERMINAL) == -1)
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &editor.terminall) == -1)
     die(terminal_attributes);
 }
 
 
 void enablecho()
 {
-  if (tcgetattr(STDIN_FILENO, &TERMINAL) == -1) {
+  if (tcgetattr(STDIN_FILENO, editor.terminall) == -1) {
     kill(terminal_attributes);
   }
   atexit(disablecho);
-  struct termios echoo = TERMINAL;
+  struct termios echoo = editor.terminall;
   // Read input in bytes not lines
   // Turn off ctrl-c/v/z
   echoo.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
@@ -40,6 +40,25 @@ void enablecho()
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &echoo) == -1) {
     kill(terminal_attributes);
   }
+}
+
+
+int editor_size(int *column, int *row)
+{
+  struct winsize editsize;
+    if (editsize.ws_col == 0)
+    {
+      return -1;
+    }
+    else if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &editsize) == -1)
+    {
+      return -1;      
+    }
+    else
+    {
+      *column = editsize.ws_col; 
+      *row = editsize.ws_row;
+    }
 }
 
 
