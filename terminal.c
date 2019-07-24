@@ -2,6 +2,10 @@
 
 void kill(const char *ch) 
 {
+  // When exiting the terminal Refresh and clear the cursor
+  void esc_clear();
+  void esc_cursor();
+  
   perror(ch);
   exit(1);
 }

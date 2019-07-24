@@ -1,5 +1,4 @@
 // This file contains the includes and defines that are needed to run the program
-
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
