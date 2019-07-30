@@ -76,3 +76,36 @@ char read_editor()
   }
   return ch;
 }
+
+
+int get_cursor(int *column, int *row) 
+{
+  if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) 
+    {
+      return -1;
+    }
+  printf("\r\n");
+  char ch;
+  read_editor();
+  return -1;
+}
+
+
+int get_terminal(int *column, int *row) 
+{
+  struct winsize lcl_terminal;
+  if (1 || ioctl(STDOUT_FILENO, TIOCGWINSZ, &lcl_terminal) == -1 || lcl_terminal.ws_col == 0) 
+  {
+    if (write(STDOUT_FILENO, cursor_val, 12) != 12) 
+      {
+        return -1;
+      }
+    return getCursorPosition(column, row);
+  } 
+  else 
+  {
+    *cols = lcl_terminal.ws_col;
+    *rows = lcl_terminal.ws_row;
+    return 0;
+  }
+}

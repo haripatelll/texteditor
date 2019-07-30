@@ -7,6 +7,8 @@ This file contains all the information for building the terminal field
 // terminal attributte
 const string terminal_attributes = "tcsetattr";
 
+const string cursor_val = "\x1b[999C\x1b[999B";
+
 // Kill the program and display message
 void kill(const char *ch);
 
@@ -21,3 +23,9 @@ int editor_size();
 
 // Return and wait for keypress
 char read_editor();
+
+// returns the location of the cursor
+int get_cursor();
+
+// Retrieves the information for the terminal based on row and column number
+int get_terminal(int *column, int *row)
