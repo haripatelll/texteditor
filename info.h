@@ -10,3 +10,8 @@ struct base_editor {
 };
 
 struct base_editor editor;
+
+struct dynamicbuff {
+  char *buff;
+  int leng;
+};

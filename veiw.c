@@ -15,14 +15,17 @@ void esc_cursor()
 
 
 void row_chars() 
-{
-	int row_count = editor.row;
-	for (int i = 0; i < row_count; i++)
+{  
+	int row_count;
+	for (row_count = 0; row_count < editor.row; row_count++) 
 	{
-		write(STDOUT_FILENO, row_print, 3);
+		write(STDOUT_FILENO, startline, 1);
+		if (row_count < editor.row - 1) 
+		{
+			write(STDOUT_FILENO, "\r\n", 2);
+		}
 	}
-}
-  
+}  
 
 void screen_refresh()
 {

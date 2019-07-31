@@ -10,7 +10,9 @@ const string esc_sequence_clear = "\x1b[2J";
 // H takes the row number and column number for cursor
 const string esc_sequence_cursor = "\x1b[H";
 // Start of each row will be this 
-const string row_print = "#\r\n";
+const string row_print = "\r\n";
+// Start of each line
+const string startline = "#";
 
 // Refresh screen;
 void esc_clear();
