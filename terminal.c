@@ -121,7 +121,7 @@ int get_terminal(int *column, int *row)
     {
       return -1;
     }
-    return getCursorPosition(column, row);
+    return get_cursor(column, row);
   } 
   else 
   {
