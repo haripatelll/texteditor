@@ -80,28 +80,28 @@ char read_editor()
 
 int get_cursor(int *column, int *row) 
 {
-  char buf[32];  
+  char buffer_zone[32];  
   if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) 
   {
     return -1;
   }
-  for (unsigned int i = 0; i < sizeof(buf) - 1; i++) 
+  for (unsigned int i = 0; i < sizeof(buffer_zone) - 1; i++) 
   {
-    if (buf[i] == 'R') 
+    if (buffer_zone[i] == 'R') 
     {
       break;
     }
-    if (read(STDIN_FILENO, &buf[i], 1) != 1) 
+    if (read(STDIN_FILENO, &buffer_zone[i], 1) != 1) 
     {
       break;
     }
   }
-  buf[i] = '\0';
-  if (buf[0] != '\x1b' || buf[1] != '[') 
+  buffer_zone[i] = '\0';
+  if (buffer_zone[0] != '\x1b' || buffer_zone[1] != '[') 
   {
     return -1;
   }
-  if (sscanf(&buf[2], "%d;%d", row, column) != 2)
+  if (sscanf(&buffer_zone[2], "%d;%d", row, column) != 2)
   {
     return -1;
   }
