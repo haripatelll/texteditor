@@ -18,7 +18,7 @@ enum arrowkeys
   UP_ARROW = 1002, DOWN_ARROW = 1003,
   UP_PAGE = 1004, DOWN_PAGE = 1005,
   HOME  = 1006, END = 1007,
-  DELETE = 1008
+  DELETE = 1008 
 };
 
 /* 
