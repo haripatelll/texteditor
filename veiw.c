@@ -61,6 +61,9 @@ void screen_refresh()
 	cons_dynamic(&db, "\x1b[?25l", 6);
 	cons_dynamic(&db, esc_sequence_cursor, 3);
 	row_chars(&db);
+	char buffer[32];
+  	snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", editor.y_coor + 1, editor.x_coor + 1);
+  	cons_dynamic(&db, buffer, strlen(buffer));
 	cons_dynamic(&db, esc_sequence_cursor, 3);
 	// Reset Mode
 	cons_dynamic(&db, "\x1b[?25h", 6);
