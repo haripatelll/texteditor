@@ -1,40 +1,76 @@
 #include "inputs.h"
 
 
-void cursormovement_editor(char arrowkeys)
+void cursormovement_editor(int keys)
 {
-	switch (arrowkeys) 
+	int boundcheck;
+	switch (keys) 
 	{
-		case 'w':
-		editor.y_coor--;
+		case UP_ARROW:
+		boundcheck = 0;
+		if (editor.y_coor != boundcheck)
+		{
+			editor.y_coor--;				
+		}
 		break;
-		case 'a':
-		editor.x_coor--;
+		case LEFT_ARROW:
+		boundcheck = 0;
+		if (editor.x_coor != boundcheck)
+		{
+			editor.x_coor--;			
+		}
 		break;
-		case 's':
-		editor.y_coor++;
+		case DOWN_ARROW:
+		boundcheck = editor.row - 1
+		if (editor.y_coor != boundcheck)
+		{
+			editor.y_coor++;			
+		}
 		break;
-		case 'd':
-		editor.x_coor++;
+		case RIGHT_ARROW:
+		boundcheck = editor.column - 1
+		if (editor.x_coor != boundcheck)
+		{
+			editor.x_coor++;
+		}
 		break;
 	}
 }
 
 void process_editor() 
 {  
-	char ch = read_editor();
+	int ch = read_editor();
+	int boundcheck;
 	switch (ch) {
 		case CTRL_KEY('q'):
 		esc_clear();
 		esc_cursor();
 		exit(0);
 		break;
-
-		case 'w':
-		case 'a':
-		case 's':
-		case 'd':
+		case UP_ARROW:
+		break;
+		case LEFT_ARROW:
+		break;
+		case DOWN_ARROW:
+		break;
+		case RIGHT_ARROW:
 		cursormovement_editor(ch);
+		break;
+		case UP_PAGE:
+		break;
+		case DOWN_PAGE:
+		{
+			int amunt = editor.row;
+			while (amunt--)
+				cursormovement_editor(ch == UP_PAGE ? UP_ARROW : DOWN_ARROW);
+		}
+		break;
+		case HOME:
+		editor.x_coor = 0;
+		break;
+		case END:
+		boundcheck = editor.column - 1;
+		editor.x_coor = boundcheck;
 		break;
 	}
 }
