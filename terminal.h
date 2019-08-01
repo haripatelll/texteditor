@@ -22,7 +22,7 @@ void enablecho();
 int editor_size();
 
 // Return and wait for keypress
-char read_editor();
+int read_editor();
 
 // returns the location of the cursor
 int get_cursor();

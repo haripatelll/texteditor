@@ -62,7 +62,7 @@ int editor_size(int *column, int *row)
 }
 
 
-char read_editor() 
+int read_editor() 
 {
   int key;
   char ch;
@@ -73,8 +73,65 @@ char read_editor()
     {
       kill(READ_ERROR);
     }
+  }  
+  if (ch == '\x1b') 
+  {
+    char arrow[3];
+    if (read(STDIN_FILENO, &arrow[0], 1) != 1) 
+    {
+      return '\x1b';
+    }
+    if (read(STDIN_FILENO, &arrow[1], 1) != 1) 
+    {
+      return '\x1b';
+    }
+    if (arrow[0] == '[') 
+    {
+      if (arrow[1] >= '0' && arrow[1] <= '9') 
+      {
+        if (read(STDIN_FILENO, &arrow[2], 1) != 1) 
+        {
+          return '\x1b';
+        }
+        if (arrow[2] == '#') 
+        {
+          switch (arrow[1]) 
+          {           
+            case '1': return HOME;
+            case '3': return DELETE;
+            case '4': return END;
+            case '5': return UP_PAGE;
+            case '6': return DOWN_PAGE;
+            case '7': return HOME;
+            case '8': return END;
+          }
+        }
+      } 
+      else 
+      {
+        switch (arrow[1]) 
+        {
+          case 'A': return UP_ARROW;
+          case 'B': return DOWN_ARROW;
+          case 'C': return RIGHT_ARROW;
+          case 'D': return LEFT_ARROW;
+          case 'H': return HOME;
+          case 'F': return END;
+        }
+      }
+    }
+    else if (arrow[0] == '0')
+    {
+      switch (arrow[1])
+      {
+        case 'H': return HOME;
+        case 'F': return END;        
+      }
+    }
+    return '\x1b';
+  } else {
+    return ch;
   }
-  return ch;
 }
 
 
