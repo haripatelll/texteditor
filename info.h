@@ -15,7 +15,9 @@ struct base_editor {
 	int row;
 	int column;
 	int rowcount;
-	editor_row rows;
+	// dynamic rows
+	int row_offset;
+	editor_row *rows;
 	struct termios terminall;
 };
 
