@@ -7,6 +7,8 @@ This file contains all the structs and overall variables
 typedef struct editor_row {
   int size;
   char *data;
+  int tabsize;
+  char *tabrend;
 } editor_row;
 
 struct base_editor {
@@ -15,8 +17,11 @@ struct base_editor {
 	int row;
 	int column;
 	int rowcount;
-	// dynamic rows
+	// row scrolling
 	int row_offset;
+	// horizontal scrolling
+	int column_offset;
+	// dynamic rows
 	editor_row *rows;
 	struct termios terminall;
 };
