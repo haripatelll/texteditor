@@ -7,7 +7,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
+#include <stdarg.h>
 #include "info.h"
+
+const int TAB_STOP = 8;
 
 // Bitwise-ANDs a character with the value 00011111
 #define CTRL_KEY(k) ((k) & 0x1f)
