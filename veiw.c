@@ -19,31 +19,37 @@ void row_chars(struct dynamicbuff *db)
 	int row_count;
 	for (row_count = 0; row_count < editor.row; row_count++) 
 	{
+		if (row_count >= editor.rowcount) {
 		// Intro
-		if (row_count == editor.row / 3)
-		{
-			char intro[80];
-			int sizee = sizeof(intro);
-			int introleng = snprintf(intro, sizee, "Tiny Texteditor");
-			if (introleng > editor.column)
+			if (row_count == editor.row / 3)
 			{
-				introleng = editor.column;
-			}
-			int pad = (editor.column - introleng) / 2;
-			if (pad) 
+				char intro[80];
+				int sizee = sizeof(intro);
+				int introleng = snprintf(intro, sizee, "Tiny Texteditor");
+				if (introleng > editor.column)
+				{
+					introleng = editor.column;
+				}
+				int pad = (editor.column - introleng) / 2;
+				if (pad) 
+				{
+					cons_dynamic(db, startline, 1);	
+					pad--;
+				}
+				while (pad--)
+				{
+					cons_dynamic(db, " ", 1);					
+				}
+				cons_dynamic(db, intro, introleng);	
+			} 
+			else 
 			{
-				cons_dynamic(db, startline, 1);	
-				pad--;
+				cons_dynamic(db, startline, 1);			
 			}
-			while (pad--)
-			{
-				cons_dynamic(db, " ", 1);					
-			}
-			cons_dynamic(db, intro, introleng);	
-		} 
-		else 
-		{
-			cons_dynamic(db, startline, 1);			
+		} else {
+			int leng = editor.rows.size;
+			if (leng > editor.column) len = editor.column;
+			abAppend(ab, editor.rows.data, leng);
 		}
 		cons_dynamic(&db, "\x1b[K", 4);
 		if (row_count < editor.row - 1) 
@@ -62,8 +68,8 @@ void screen_refresh()
 	cons_dynamic(&db, esc_sequence_cursor, 3);
 	row_chars(&db);
 	char buffer[32];
-  	snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", editor.y_coor + 1, editor.x_coor + 1);
-  	cons_dynamic(&db, buffer, strlen(buffer));
+	snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", editor.y_coor + 1, editor.x_coor + 1);
+	cons_dynamic(&db, buffer, strlen(buffer));
 	cons_dynamic(&db, esc_sequence_cursor, 3);
 	// Reset Mode
 	cons_dynamic(&db, "\x1b[?25h", 6);
