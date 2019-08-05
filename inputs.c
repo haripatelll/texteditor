@@ -3,6 +3,7 @@
 
 void cursormovement_editor(int keys)
 {
+	editor_row *currow = (editor.rowcount <= editor.y_coor) ? NULL : &editor.rows[editor.y_coor];
 	int boundcheck;
 	switch (keys) 
 	{
@@ -18,24 +19,40 @@ void cursormovement_editor(int keys)
 		if (editor.x_coor != boundcheck)
 		{
 			editor.x_coor--;			
+		} 
+		else if (editor.y_coor > 0) 
+		{
+			editor.y_coor--;
+			editor.x_coor = editor.rows[editor.y_coor].size;
 		}
 		break;
 		case DOWN_ARROW:
-		boundcheck = editor.row - 1
-		if (editor.y_coor != boundcheck)
+		boundcheck = editor.row - 1;
+		if (editor.y_coor < editor.rowcount)
 		{
 			editor.y_coor++;			
 		}
 		break;
 		case RIGHT_ARROW:
-		boundcheck = editor.column - 1
-		if (editor.x_coor != boundcheck)
+		boundcheck = editor.column - 1;
+		if (currow && editor.x_coor < currow->size)
 		{
 			editor.x_coor++;
-		}
+		} 
+		else if (currow && editor.x_coor == currow->size) 
+		{
+			editor.y_coor++;
+			editor.x_coor = 0;
+		}  
 		break;
 	}
+	currow = (editor.y_coor >= editor.numrows) ? NULL : &editor.rows[editor.y_coor];
+	int rowlen = currow ? currow->size : 0;
+	if (editor.x_coor > rowlen) {
+		editor.x_coor = rowlen;
+	}
 }
+
 
 void process_editor() 
 {  
