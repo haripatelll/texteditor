@@ -61,32 +61,88 @@ void row_chars(struct dynamicbuff *db)
 			}
 			addrow(db, &editor.rows[filerows].tabrender[editor.column_offset], leng);
 		}
-		cons_dynamic(&db, "\x1b[K", 4);
-		if (row_count < editor.row - 1) 
-		{
-			cons_dynamic(STDOUT_FILENO, row_print, 2);
-		}
+		cons_dynamic(&db, "\x1b[K", 3);
+		cons_dynamic(STDOUT_FILENO, row_print, 2);
 	}
 }  
 
 
+void statusbar(struct dynamicbuff *db) 
+{
+	cons_dynamic(db, "\x1b[7m", 4);
+	char status[80];
+	char renderstatus[80];
+	int leng = snprintf(status, sizeof(status), "%.20s - %d lines",
+		editor.file ? editor.file : "[No Name]", editor.rowcount);
+	int renderleng = snprintf(renderstatus, sizeof(renderstatus), "%d/%d",
+		editor.y_coor + 1, editor.rowcount);
+	if (leng > editor.column) 
+	{
+		leng = editor.column;
+	}
+	cons_dynamic(db, status, leng);
+	while (leng < editor.column) 
+	{
+		if (editor.column - leng == renderleng) {
+			cons_dynamic(db, renderstatus, renderleng);
+			break;
+		} else {
+			leng++;
+			cons_dynamic(db, " ", 1);
+		}
+	}
+	cons_dynamic(db, "\x1b[m", 3);
+	cons_dynamic(db, "\r\n", 2);
+}
+
+
+void setstatus(const char *mesg, ...) 
+{
+	va_list argpassed;
+	va_start(argpassed, mesg);
+	vsnprintf(editor.statmesg, sizeof(editor.statmesg), mesg, argpassed);
+	va_end(argpassed);
+	editor.statmesg_time = time(NULL);
+}
+
+
+void mesgbar(struct dynamicbuff *db) 
+{
+	cons_dynamic(db, "\x1b[K", 3);
+	int leng = strlen(editor.statmesg);
+	if (leng > editor.column) 
+	{
+		leng = editor.column;
+	}
+	if (leng && time(NULL) - editor.statmesg_time < 5)
+	{
+		cons_dynamic(db, editor.statmesg, leng);
+	}
+}
+
 void scroll() 
 {
+	editor.rx_coor = 0;
+	if (editor.y_coor < editor.rowcount) 
+	{
+		editor.x_coor = cordfix(&editor.rows[editor.y_coor],
+			editor.x_coor);
+	}
 	if (editor.y_coor >= editor.row_offset + editor.row) 
 	{
-		editor.row_offset = editor.cy - editor.row + 1;
+		editor.row_offset = editor.y_coor - editor.row + 1;
 	}
 	if (editor.y_coor < editor.row_offset) 
 	{
-		editor.row_offset = editor.cy;
+		editor.row_offset = editor.y_coor;
 	}
-	if (editor.x_coor < editor.column_offset) 
+	if (editor.rx_coor < editor.column_offset) 
 	{
-		editor.column_offset = editor.x_coor;
+		editor.column_offset = editor.rx_coor;
 	}
-	if (editor.x_coor >= editor.column_offset + editor.column) 
+	if (editor.rx_coor >= editor.column_offset + editor.column) 
 	{
-		editor.column_offset = editor.x_coor - editor.column + 1;
+		editor.column_offset = editor.rx_coor - editor.column + 1;
 	}
 }
 
@@ -99,10 +155,12 @@ void screen_refresh()
 	cons_dynamic(&db, "\x1b[?25l", 6);
 	cons_dynamic(&db, esc_sequence_cursor, 3);
 	row_chars(&db);
+	statusbar(&db);
+	mesgbar(&db);
 	char buffer[32];
 	// Position fix
 	snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", (editor.y_coor - editor.row_offset) + 1, 
-		(editor.x_coor - editor.column_offset) + 1);
+		(editor.rx_coor - editor.column_offset) + 1);
 	cons_dynamic(&db, buffer, strlen(buffer));
 	cons_dynamic(&db, esc_sequence_cursor, 3);
 	// Reset Mode

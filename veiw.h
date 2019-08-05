@@ -23,6 +23,15 @@ void esc_cursor();
 // Function to display characters for each row
 void row_chars();
 
+// Sets and draws the status bar for editor
+void statusbar(struct dynamicbuff *db) 
+
+// Sets the overall status for the bar
+void setstatus(const char *mesg, ...) 
+
+// Draws the message bar
+void mesgbar(struct dynamicbuff *db) 
+
 // Function to scroll the editor up and down to keep cursor inside
 void scroll() 
 
