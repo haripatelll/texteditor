@@ -6,6 +6,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
 #include "info.h"
 
 // Bitwise-ANDs a character with the value 00011111
