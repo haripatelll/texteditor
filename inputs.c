@@ -76,7 +76,19 @@ void process_editor()
 		case UP_PAGE:
 		break;
 		case DOWN_PAGE:
-		{
+		{       
+			if (ch == UP_PAGE) 
+			{
+				editor.y_coor = editor.row_offset;
+			} 
+			else if (ch == DOWN_PAGE) 
+			{
+				editor.y_coor = editor.row_offset + editor.row - 1;
+				if (editor.y_coor > editor.rowcount) 
+				{
+					editor.y_coor = editor.rowcount;
+				}
+			}
 			int amunt = editor.row;
 			while (amunt--)
 				cursormovement_editor(ch == UP_PAGE ? UP_ARROW : DOWN_ARROW);
@@ -85,9 +97,11 @@ void process_editor()
 		case HOME:
 		editor.x_coor = 0;
 		break;
-		case END:
-		boundcheck = editor.column - 1;
-		editor.x_coor = boundcheck;
+		case END:      
+		if (editor.y_coor < editor.rowcount)
+		{
+			editor.x_coor = editor.rows[editor.y_coor].size;
+		}
 		break;
 	}
 }
