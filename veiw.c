@@ -19,9 +19,10 @@ void row_chars(struct dynamicbuff *db)
 	int row_count;
 	for (row_count = 0; row_count < editor.row; row_count++) 
 	{
-		if (row_count >= editor.rowcount) {
+		int filerows =  editor.row_offset + row_count;
+		if (filerows >= editor.rowcount) {
 		// Intro
-			if (row_count == editor.row / 3)
+			if (editor.rowcount == 0 && y == editor.row / 3) 
 			{
 				char intro[80];
 				int sizee = sizeof(intro);
@@ -47,9 +48,9 @@ void row_chars(struct dynamicbuff *db)
 				cons_dynamic(db, startline, 1);			
 			}
 		} else {
-			int leng = editor.rows.size;
+			int leng = editor.rows[filerows].size;
 			if (leng > editor.column) len = editor.column;
-			abAppend(ab, editor.rows.data, leng);
+			addrow(ab, editor.rows[filerows].data, leng);
 		}
 		cons_dynamic(&db, "\x1b[K", 4);
 		if (row_count < editor.row - 1) 
@@ -60,8 +61,22 @@ void row_chars(struct dynamicbuff *db)
 }  
 
 
+void scroll() 
+{
+	if (editor.y_coor >= editor.row_offset + editor.row) 
+	{
+		editor.row_offset = editor.cy - editor.row + 1;
+	}
+	if (editor.y_coor < editor.row_offset) 
+	{
+		editor.row_offset = editor.cy;
+	}
+}
+
+
 void screen_refresh()
 {  
+	scroll();
 	struct dynamicbuff db = DYNAMIC;
 	// Set Mode
 	cons_dynamic(&db, "\x1b[?25l", 6);

@@ -23,5 +23,8 @@ void esc_cursor();
 // Function to display characters for each row
 void row_chars();
 
+// Function to scroll the editor up and down to keep cursor inside
+void scroll() 
+
 // Function to clear the screen 
 void screen_refresh();
