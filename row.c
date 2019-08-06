@@ -168,7 +168,8 @@ void insertendline()
   if (editor.x_coor == 0) 
   {
     addrow( "", 0, editor.y_coor);
-  } else {
+  } else 
+  {
     editor_row *currow = &editor.rows[editor.y_coor];
     addrow(&currow->data[editor.x_coor], currow->size - editor.x_coor, editor.y_coor + 1);
     currow = &editor.rows[editor.y_coor];
