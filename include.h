@@ -8,9 +8,11 @@
 #include <string.h>
 #include <sys/types.h>
 #include <stdarg.h>
+#include <fcntl.h>
 #include "info.h"
 
 const int TAB_STOP = 8;
+const int QUIT_COUNT = 2;
 
 // Bitwise-ANDs a character with the value 00011111
 #define CTRL_KEY(k) ((k) & 0x1f)
@@ -22,7 +24,7 @@ enum arrowkeys
   UP_ARROW = 1002, DOWN_ARROW = 1003,
   UP_PAGE = 1004, DOWN_PAGE = 1005,
   HOME  = 1006, END = 1007,
-  DELETE = 1008
+  DELETE = 1008, BACKSPACE = 127
 };
 
 /* 
