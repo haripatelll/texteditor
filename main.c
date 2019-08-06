@@ -5,63 +5,23 @@
 #include "info.h"
 
 
-// convert x_coor to render x coor;
-int cordfix(editor_row *currrow, int x_coor) 
-{
-  int rx_coor = 0;
-  for (int i = 0; i < x_coor; i++) 
-  {
-    if (currrow->chars[i] == '\t')
-    {
-      rx_coor += (TAB_STOP - 1) - (rx_coor % TAB_STOP);
-    }
-    rx_coor++;
-  }
-  return rx_coor;
-}
-
-
-void rowupdate(editor_row *currrow) 
-{
-	int tab = 0;
-	for (i = 0; i < currrow->size; i++)
+char *rowstring(int * bufferleng) {
+	int maxleng = 0;
+	for (int i = 0; i < editor.rowcount; i++)
 	{
-		if (currrow->data[i] == '\t') 
-		{
-			tab++;
-		}
+		maxleng += editor.rows[i].size + 1;
 	}
-	free(currrow->tabrend);
-	currrow->tabrend = malloc(currrow->size + tab*(TAB_STOP - 1) + 1);
-	int idx = 0;
-	for (int i = 0; i < currrow->size; i++) 
-	{    
-		if (currrow->data[i] == '\t') 
-		{
-			currrow->tabrend[idx++] = ' ';
-			while (idx % TAB_STOP != 0) 
-			{
-				currrow->tabrend[idx++] = ' ';
-			}
-		} else {
-			currrow->tabrend[idx++] = currrow->data[i];
-		}
+	* bufferleng = maxleng;
+	char *buffer = malloc(maxleng);
+	char *point = buffer;
+	for (int i = 0; i < editor.rowcount; i++) 
+	{
+		memcpy(p, editor.rows[i].data, editor.rows[i].size);
+		point += editor.rows[i].size;
+		*point = '\n';
+		point++;
 	}
-	currrow->tabrend[idx] = '\0';
-	currrow->tabsize = idx;
-}
-
-void addrow(char *line, int leng) {  
-	editor.rows = realloc(editor.rows, sizeof(editor_row) * (editor.rowcount + 1));
-	int idx = editor.rowcount;
-	editor.rows[idx].size = leng;
-	editor.rows[idx].data = malloc(len + 1);
-	memcpy(editor.rows[idx].data, line, leng);
-	editor.rows[idx].chars[leng] = '\0';
-	editor.rows[idx].tabrend = NULL;
-	editor.rows[idx].tabsize = 0;
-	rowupdate(&editor.rows[idx]);
-	editor.rowcount++;
+	return buffer;
 }
 
 
@@ -82,10 +42,46 @@ void openfile(char *file)
 		{
 			leng--;
 		}    
-		addrow(introline, introcapacity);
+		addrow(introline, introcapacity, editor.rowcount);
 	}  
 	free(introline);
 	fclose(openedfile);
+	editor.modifed = 0;
+}
+
+
+void save() 
+{
+	if (editor.file == NULL) 
+	{    
+		editor.file = userprompt("Save as: %s, Press ESC to cancel");
+		if (editor.filename == NULL) 
+		{
+			setstatus("Save Stopped");
+			return;
+		}
+	}
+	int leng;
+	char *buffer = rowstring(&leng);
+	// Read and write open files
+	int curfile = open(editor.file, O_RDWR | O_CREAT, 0644);
+	if (curfile != -1) 
+	{
+		if (ftruncate(curfile, leng) != -1) 
+		{
+			if (write(curfile, buffer, leng) == leng) 
+			{
+				close(curfile);
+				free(buffer);
+				editor.modifed = 0;
+				setstatus("%d data saved", leng);
+				return;
+			}
+		}
+		close(curfile);
+	}
+	free(buffer);
+	setstatus("Save Error: %s", strerror(errno));
 }
 
 
@@ -101,6 +97,7 @@ void start_editor()
 	editor.file = NULL;
 	editor.statmesg[0] = '\0';
 	editor.statmesg_time = 0;
+	editor.modifed = 0;
 	if (editor_size(&editor.column, &editor.row) == -1)
 	{
 		kill("Editor Size");
@@ -120,6 +117,7 @@ int main(int argc, char *argv[])
 	{
 		editorOpen(argv[1]);
 	}
+	setstatus("HELP: Ctrl-S = save & Ctrl-Q = quit");
 	screen_refresh():
 	process_editor();
 
