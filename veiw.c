@@ -72,8 +72,9 @@ void statusbar(struct dynamicbuff *db)
 	cons_dynamic(db, "\x1b[7m", 4);
 	char status[80];
 	char renderstatus[80];
-	int leng = snprintf(status, sizeof(status), "%.20s - %d lines",
-		editor.file ? editor.file : "[No Name]", editor.rowcount);
+	int leng = snprintf(status, sizeof(status), "%.20s - %d %s",
+		editor.file ? editor.file : "[No Name]", editor.rowcount,
+		editor.modified ? "(modified)" : "");
 	int renderleng = snprintf(renderstatus, sizeof(renderstatus), "%d/%d",
 		editor.y_coor + 1, editor.rowcount);
 	if (leng > editor.column) 
