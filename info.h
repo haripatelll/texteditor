@@ -24,6 +24,9 @@ struct base_editor {
 	int row_offset;
 	// horizontal scrolling
 	int column_offset;
+	// Essentially a dirty bit to see 
+	// if we modifed the file
+	int modifed;
 	// dynamic rows
 	editor_row *rows;
 	char *file;
