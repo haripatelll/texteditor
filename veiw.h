@@ -2,6 +2,7 @@
 This file contains all the information for inputs given to the editor
 */
 #include "include.h"
+#include "row.h"
 
 // \x1b is the escape character 
 // 2 is to clear the entire screen
