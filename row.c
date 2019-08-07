@@ -16,6 +16,24 @@ int cordfix(editor_row *currrow, int x_coor)
 }
 
 
+
+int rendercordfix(editor_row *currrow, int rx_coor)
+{	 
+	int current_rx = 0;
+	for (int x_coorr = 0; x_coorr < currow->size; x_coorr++) 
+	{
+		if (currow->data[x_coorr] == '\t')
+		{
+			current_rx += (TAB_STOP - 1) - (current_rx % TAB_STOP);
+		}
+		current_rx++;
+		if (current_rx > rx_coor) return x_coorr;
+	}
+	return x_coorr;
+}
+
+
+
 void rowupdate(editor_row *currrow) 
 {
 	int tab = 0;
@@ -165,18 +183,18 @@ void deletechar()
 
 void insertendline()
 {
-  if (editor.x_coor == 0) 
-  {
-    addrow( "", 0, editor.y_coor);
-  } else 
-  {
-    editor_row *currow = &editor.rows[editor.y_coor];
-    addrow(&currow->data[editor.x_coor], currow->size - editor.x_coor, editor.y_coor + 1);
-    currow = &editor.rows[editor.y_coor];
-    currow->size = editor.x_coor;
-    currow->data[currow->size] = '\0';
-    rowupdate(currow);
-  }
-  editor.x_coor = 0;
-  editor.y_coor++;
+	if (editor.x_coor == 0) 
+	{
+		addrow( "", 0, editor.y_coor);
+	} else 
+	{
+		editor_row *currow = &editor.rows[editor.y_coor];
+		addrow(&currow->data[editor.x_coor], currow->size - editor.x_coor, editor.y_coor + 1);
+		currow = &editor.rows[editor.y_coor];
+		currow->size = editor.x_coor;
+		currow->data[currow->size] = '\0';
+		rowupdate(currow);
+	}
+	editor.x_coor = 0;
+	editor.y_coor++;
 }

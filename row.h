@@ -1,7 +1,13 @@
+/*
+This file contains all the row functions
+*/
 #include "include.h"
 
-// convert x_coor to render x coor;
+// convert x_coor to render x_coor
 int cordfix(editor_row *currrow, int x_coor);
+
+// conver rx_coor to x_coor
+int rendercordfix(editor_row *currrow, int rx_coor);
 
 // updates the rows insdie the editor
 void rowupdate(editor_row *currrow);
