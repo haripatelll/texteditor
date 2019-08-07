@@ -1,7 +1,7 @@
 #include "inputs.h"
 
 
-char *editorPrompt(char *prompt) 
+char *userprompt(char *prompt, void (*func)(char *, int)) 
 {
 	int buffersize = 128;
 	char *buffer = malloc(buffersize);
@@ -24,12 +24,20 @@ char *editorPrompt(char *prompt)
 			if (bufferleng != 0) 
 			{
 				setstatus("");
+				if (func) 
+				{
+					func(buffer, ch);
+				}
 				return buffer;
 			}
 		} 
 		else if (ch == '\x1b') 
 		{
 			setstatus("");
+			if (func) 
+			{
+				func(buffer, ch);
+			}
 			free(buffer);
 			return NULL;
 		} 
@@ -42,6 +50,11 @@ char *editorPrompt(char *prompt)
 			}
 			buffer[bufferleng++] = ch;
 			buffer[bufferleng] = '\0';
+		}
+		
+		if (func) 
+		{
+			func(buffer, ch);
 		}
 	}
 }
@@ -123,6 +136,9 @@ void process_editor()
 		case CTRL_KEY('h'):
 		break;
 		case CTRL_KEY('l'):
+		break;
+		case CTRL_KEY('f'):
+		search();
 		break;		
 		case '\r':
 		insertendline();
