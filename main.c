@@ -5,7 +5,8 @@
 #include "info.h"
 
 
-char *rowstring(int * bufferleng) {
+char *rowstring(int * bufferleng) 
+{
 	int maxleng = 0;
 	for (int i = 0; i < editor.rowcount; i++)
 	{
@@ -54,7 +55,7 @@ void save()
 {
 	if (editor.file == NULL) 
 	{    
-		editor.file = userprompt("Save as: %s, Press ESC to cancel");
+		editor.file = userprompt("Save as: %s, Press ESC to cancel", NULL);
 		if (editor.filename == NULL) 
 		{
 			setstatus("Save Stopped");
@@ -117,7 +118,7 @@ int main(int argc, char *argv[])
 	{
 		editorOpen(argv[1]);
 	}
-	setstatus("HELP: Ctrl-S = save & Ctrl-Q = quit");
+	setstatus("HELP: Ctrl-S = save && Ctrl-Q = quit && Ctrl-F = Search");
 	screen_refresh():
 	process_editor();
 
