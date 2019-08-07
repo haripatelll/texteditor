@@ -14,14 +14,14 @@ void kill(const char *ch)
 void disablecho() 
 {
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &editor.terminall) == -1)
-    die(terminal_attributes);
+    die(TERMINAL_ATTRIBUTE);
 }
 
 
 void enablecho()
 {
   if (tcgetattr(STDIN_FILENO, editor.terminall) == -1) {
-    kill(terminal_attributes);
+    kill(TERMINAL_ATTRIBUTE);
   }
   atexit(disablecho);
   struct termios echoo = editor.terminall;
@@ -38,7 +38,7 @@ void enablecho()
   echoo.c_cc[VMIN] = 0;
   echoo.c_cc[VTIME] = 1;
   if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &echoo) == -1) {
-    kill(terminal_attributes);
+    kill(TERMINAL_ATTRIBUTE);
   }
 }
 
@@ -174,7 +174,7 @@ int get_terminal(int *column, int *row)
   struct winsize lcl_terminal;
   if ( ioctl(STDOUT_FILENO, TIOCGWINSZ, &lcl_terminal) == -1 || lcl_terminal.ws_col == 0) 
   {
-    if (write(STDOUT_FILENO, cursor_val, 12) != 12) 
+    if (write(STDOUT_FILENO, CURSOR_VAL, 12) != 12) 
     {
       return -1;
     }

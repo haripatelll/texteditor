@@ -7,13 +7,13 @@ This file contains all the information for inputs given to the editor
 // \x1b is the escape character 
 // 2 is to clear the entire screen
 // J clear screen
-const string esc_sequence_clear = "\x1b[2J";
+const string ESC_CLEAR = "\x1b[2J";
 // H takes the row number and column number for cursor
-const string esc_sequence_cursor = "\x1b[H";
+const string ESC_CURSOR = "\x1b[H";
 // Start of each row will be this 
-const string row_print = "\r\n";
+const string ROW_PRINT = "\r\n";
 // Start of each line
-const string startline = "#";
+const string STARTLINE = "#";
 
 // Refresh screen;
 void esc_clear();

@@ -5,9 +5,9 @@ This file contains all the information for building the terminal field
 #include "view.h"
 
 // terminal attributte
-const string terminal_attributes = "tcsetattr";
+const string TERMINAL_ATTRIBUTE = "tcsetattr";
 
-const string cursor_val = "\x1b[999C\x1b[999B";
+const string CURSOR_VAL = "\x1b[999C\x1b[999B";
 
 // Kill the program and display message
 void kill(const char *ch);

@@ -3,14 +3,14 @@
 void esc_clear()
 {
 	// Write 4 bytes to the terminal view
-	write(STDOUT_FILENO, esc_sequence_clear, 4);	
+	write(STDOUT_FILENO, ESC_CLEAR, 4);	
 }
 
 
 void esc_cursor()
 {
 	// 3 bytes for the cursor psotioning
-	write(STDOUT_FILENO, esc_sequence_cursor, 3);
+	write(STDOUT_FILENO, ESC_CURSOR, 3);
 }
 
 
@@ -34,7 +34,7 @@ void row_chars(struct dynamicbuff *db)
 				int pad = (editor.column - introleng) / 2;
 				if (pad) 
 				{
-					cons_dynamic(db, startline, 1);	
+					cons_dynamic(db, STARTLINE, 1);	
 					pad--;
 				}
 				while (pad--)
@@ -45,7 +45,7 @@ void row_chars(struct dynamicbuff *db)
 			} 
 			else 
 			{
-				cons_dynamic(db, startline, 1);			
+				cons_dynamic(db, STARTLINE, 1);			
 			}
 		} 
 		else 
@@ -62,7 +62,7 @@ void row_chars(struct dynamicbuff *db)
 			addrow(db, &editor.rows[filerows].tabrender[editor.column_offset], leng);
 		}
 		cons_dynamic(&db, "\x1b[K", 3);
-		cons_dynamic(STDOUT_FILENO, row_print, 2);
+		cons_dynamic(STDOUT_FILENO, ROW_PRINT, 2);
 	}
 }  
 
@@ -154,7 +154,7 @@ void screen_refresh()
 	struct dynamicbuff db = DYNAMIC;
 	// Set Mode
 	cons_dynamic(&db, "\x1b[?25l", 6);
-	cons_dynamic(&db, esc_sequence_cursor, 3);
+	cons_dynamic(&db, ESC_CURSOR, 3);
 	row_chars(&db);
 	statusbar(&db);
 	mesgbar(&db);
@@ -163,7 +163,7 @@ void screen_refresh()
 	snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", (editor.y_coor - editor.row_offset) + 1, 
 		(editor.rx_coor - editor.column_offset) + 1);
 	cons_dynamic(&db, buffer, strlen(buffer));
-	cons_dynamic(&db, esc_sequence_cursor, 3);
+	cons_dynamic(&db, ESC_CURSOR, 3);
 	// Reset Mode
 	cons_dynamic(&db, "\x1b[?25h", 6);
 	write(STDOUT_FILENO, db.buff, db.leng);
