@@ -1,15 +1,25 @@
+OBJ=out
+SRC=source
+INC=include
+
 CXX = g++
 CXXFLAGS = -std=c++14 -Wall -Werror=vla -g -MMD
-EXEC = tinytexteditor
-OBJECTS = texteditor.o
-DEPENDS = ${OBJECTS:.o=.d}
+SOURCES=${wildcard ${SRC}/*.cc}
+OBJECTS=${patsubst ${SRC}/%.cc, ${OBJ}/%.o, ${SOURCES}}
+EXEC=texteditor
+
+-include ${DEPENDS}
 
 ${EXEC}: ${OBJECTS}
 	 ${CXX} ${CXXFLAGS} ${OBJECTS} -o ${EXEC}
 
--include ${DEPENDS}
+${OBJ}:
+	mkdir -p $@
 
-.PHONY: clean
+${OBJ}/%.o : $(addprefix ${SRC}/, %.cc) | ${OBJ}
+	${CXX} ${CXXFLAGS} -c -o $@ $<
+
+.PHONY : clean
 
 clean:
-	rm ${OBJECTS} ${EXEC} ${DEPENDS}
+	rm -r ${wildcard ${OBJ}} ${wildcard ${EXEC}}
