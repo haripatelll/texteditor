@@ -5,9 +5,11 @@ This file contains all the information for inputs given to the editor
 #include "terminal.h"
 #include "view.h"
 #include "row.h"
+#include "search.h"
 
 // Prompt user to input a filename when saving a new file
-char *userprompt(char *prompt);
+// conatins callback function
+char *userprompt(char *prompt, void (*func)(char *, int));
 
 // Allows us to shift the cursor position
 void cursormovement_editor(int arrowkeys);
