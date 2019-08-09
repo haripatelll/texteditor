@@ -1,25 +1,29 @@
 OBJ=out
 SRC=source
-INC=include
 
-CXX = g++
-CXXFLAGS = -std=c++14 -Wall -Werror=vla -g -MMD
-SOURCES=${wildcard ${SRC}/*.cc}
-OBJECTS=${patsubst ${SRC}/%.cc, ${OBJ}/%.o, ${SOURCES}}
+
+CXX=gcc
+CXXFLAGS=-Wall -Wextra
+ONE= source/one/main.c
+SOURCES=${wildcard ${SRC}/*.c}
+OBJECTS=${patsubst ${SRC}/%.c, ${OBJ}/%.o, ${SOURCES}}
 EXEC=texteditor
 
--include ${DEPENDS}
+${EXEC}:
+	${CXX} ${ONE} -o ${EXEC} ${CXXFLAGS}
 
-${EXEC}: ${OBJECTS}
-	 ${CXX} ${CXXFLAGS} ${OBJECTS} -o ${EXEC}
+${EXECC}: ${OBJECTS}
+	${CXX} ${CXXFLAGS} ${OBJECTS} -o ${EXEC}
 
 ${OBJ}:
 	mkdir -p $@
 
-${OBJ}/%.o : $(addprefix ${SRC}/, %.cc) | ${OBJ}
+${OBJ}/%.o : $(addprefix ${SRC}/, %.c) | ${OBJ}
 	${CXX} ${CXXFLAGS} -c -o $@ $<
 
 .PHONY : clean
 
 clean:
 	rm -r ${wildcard ${OBJ}} ${wildcard ${EXEC}}
+
+#gcc -Wall -W -pedantic  -c main.c -o main.o
