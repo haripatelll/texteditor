@@ -14,23 +14,25 @@
 #include <termios.h>
 
 
-const int TAB_STOP = 8;
-const int QUIT_COUNT = 2;
-
-
 // Bitwise-ANDs a character with the value 00011111
 #define CTRL_KEY(k) ((k) & 0x1f)
+#define QUIT_COUNT  1;
+const int TAB_STOP = 8;
 
 
 // Designates the keys to characters
 enum arrowkeys 
 {
-	BACKSPACE = 127, LEFT_ARROW = 1000, 
-	RIGHT_ARROW = 1001, UP_ARROW = 1002, 
-	DOWN_ARROW = 1003,
-	UP_PAGE = 1004, DOWN_PAGE = 1005,
-	HOME  = 1006, END = 1007,
-	DELETE = 1008,
+  BACKSPACE = 127,
+  LEFT = 1000,
+  RIGHT,
+  UP,
+  DOWN,
+  DELETE,
+  HOME,
+  END,
+  PAGE_UP,
+  PAGE_DOWN
 };
 
 
@@ -109,9 +111,8 @@ void esc_cursor()
 void kill(const char *ch) 
 {
   // When exiting the terminal Refresh and clear the cursor
-	void esc_clear();
-	void esc_cursor();
-
+	esc_clear();
+	esc_cursor();
 	perror(ch);
 	exit(1);
 }
@@ -120,7 +121,9 @@ void kill(const char *ch)
 void disablecho() 
 {
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &editor.terminall) == -1)
+	{
 		kill("tcsetattr");
+	}
 }
 
 
@@ -188,8 +191,8 @@ int read_editor()
 						case '1': return HOME;
 						case '3': return DELETE;
 						case '4': return END;
-						case '5': return UP_PAGE;
-						case '6': return DOWN_PAGE;
+						case '5': return PAGE_UP;
+						case '6': return PAGE_DOWN;
 						case '7': return HOME;
 						case '8': return END;
 					}
@@ -199,10 +202,10 @@ int read_editor()
 			{
 				switch (arrow[1]) 
 				{
-					case 'A': return UP_ARROW;
-					case 'B': return DOWN_ARROW;
-					case 'C': return RIGHT_ARROW;
-					case 'D': return LEFT_ARROW;
+					case 'A': return UP;
+					case 'B': return DOWN;
+					case 'C': return RIGHT;
+					case 'D': return LEFT;
 					case 'H': return HOME;
 					case 'F': return END;
 				}
@@ -225,14 +228,14 @@ int read_editor()
 }
 
 
-int get_cursor(int *column, int *row) 
+int get_cursor(int *row, int *column) 
 {
 	char buffer_zone[32];  
+	unsigned int i = 0;
 	if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) 
 	{
 		return -1;
 	}
-	unsigned int i = 0;
 	for (i = 0; i < sizeof(buffer_zone) - 1; i++) 
 	{
 		if (buffer_zone[i] == 'R') 
@@ -260,7 +263,7 @@ int get_cursor(int *column, int *row)
 }
 
 
-int editor_size(int *column, int *row) 
+int editor_size(int *row, int *column) 
 {
 	struct winsize lcl_terminal;
 	if ( ioctl(STDOUT_FILENO, TIOCGWINSZ, &lcl_terminal) == -1 || lcl_terminal.ws_col == 0) 
@@ -269,12 +272,12 @@ int editor_size(int *column, int *row)
 		{
 			return -1;
 		}
-		return get_cursor(column, row);
+		return get_cursor(row, column);
 	} 
 	else 
 	{
-		*column = lcl_terminal.ws_col;
 		*row = lcl_terminal.ws_row;
+		*column = lcl_terminal.ws_col;
 		return 0;
 	}
 }
@@ -307,11 +310,14 @@ int rendercordfix(editor_row *currow, int rx_coor)
 			current_rx += (TAB_STOP - 1) - (current_rx % TAB_STOP);
 		}
 		current_rx++;
-		if (current_rx > rx_coor) return x_coorr;
+		if (current_rx > rx_coor)
+		{
+			return x_coorr;
+		}
+
 	}
 	return x_coorr;
 }
-
 
 
 void rowupdate(editor_row *currow) 
@@ -400,7 +406,7 @@ void rowinsertchar(editor_row *currow, int idx, int ch)
 }
 
 
-void rowappendstring(editor_row *currow, char *str, int leng)
+void rowappendstring(editor_row *currow, char *str, size_t leng)
 {
 	currow->data = realloc(currow->data, currow->size + leng + 1);
 	memcpy(&currow->data[currow->size], str, leng);
@@ -440,7 +446,8 @@ void insertendline()
 	if (editor.x_coor == 0) 
 	{
 		addrow(editor.y_coor, "", 0);
-	} else 
+	} 
+	else 
 	{
 		editor_row *currow = &editor.rows[editor.y_coor];
 		addrow(editor.y_coor + 1, &currow->data[editor.x_coor],
@@ -455,7 +462,6 @@ void insertendline()
 }
 
 
-
 void deletechar() 
 {
 	if (editor.y_coor == editor.rowcount) 
@@ -467,7 +473,8 @@ void deletechar()
 		return;
 	}
 	editor_row *currow = &editor.rows[editor.y_coor];
-	if (editor.x_coor > 0) {
+	if (editor.x_coor > 0) 
+	{
 		rowdeletechar(currow, editor.x_coor - 1);
 		editor.x_coor--;
 	}
@@ -515,10 +522,11 @@ void openfile(char *file)
 	}
 	char *introline = NULL;
 	size_t introcapacity = 0;
-	ssize_t leng;
+	ssize_t leng = 0;
 	while ((leng = getline(&introline, &introcapacity, openedfile) != 1)) 
 	{
-		while (leng > 0 && (introline[leng - 1] == '\r' || introline[leng - 1] == '\n'))
+		while (leng > 0 && 
+			(introline[leng - 1] == '\r' || introline[leng - 1] == '\n'))
 		{
 			leng--;
 		}    
@@ -575,11 +583,11 @@ void searchfunc(char *find, int key)
 		direction = 1;
 		return;
 	}
-	else if (key == UP_ARROW) 
+	else if (key == UP) 
 	{
 		direction = -1;
 	}
-	else if (key == DOWN_ARROW) 
+	else if (key == DOWN) 
 	{
 		direction = 1;
 	}
@@ -611,7 +619,6 @@ void searchfunc(char *find, int key)
 			prev_find = cur_find;
 			editor.y_coor = cur_find;
 			editor.x_coor = rendercordfix(currow, same - currow->tabrend);
-			editor.x_coor = same - currow->tabrend;
 			editor.row_offset = editor.rowcount;
 			break;
 		}
@@ -666,7 +673,7 @@ void scroll()
 	editor.rx_coor = 0;
 	if (editor.y_coor < editor.rowcount) 
 	{
-		editor.x_coor = cordfix(&editor.rows[editor.y_coor],
+		editor.rx_coor = cordfix(&editor.rows[editor.y_coor],
 			editor.x_coor);
 	}
 	if (editor.y_coor >= editor.row_offset + editor.row) 
@@ -701,7 +708,7 @@ void row_chars(struct dynamicbuff *db)
 			{
 				char intro[80];
 				int sizee = sizeof(intro);
-				int introleng = snprintf(intro, sizee, "Tiny Texteditor");
+				int introleng = snprintf(intro, sizee, "Tiny Texteditor - Harish Patel");
 				if (introleng > editor.column)
 				{
 					introleng = editor.column;
@@ -734,9 +741,13 @@ void row_chars(struct dynamicbuff *db)
 			{ 
 				leng = editor.column;
 			}
+			cons_dynamic(db, &editor.rows[filerows].tabrend[editor.column_offset], leng);
+			/*
 			char *ch = &editor.rows[filerows].tabrend[editor.column_offset];
-			for (int i = 0; i < leng; i++) {
-				if (isdigit(ch[i])) {
+			for (int i = 0; i < leng; i++) 
+			{
+				if (isdigit(ch[i]))
+				 {
 					cons_dynamic(db, "\x1b[31m", 5);
 					cons_dynamic(db, &ch[i], 1);
 					cons_dynamic(db, "\x1b[39m", 5);
@@ -744,6 +755,7 @@ void row_chars(struct dynamicbuff *db)
 					cons_dynamic(db, &ch[i], 1);
 				}
 			}
+			*/
 		}
 		cons_dynamic(db, "\x1b[K", 3);
 		cons_dynamic(db, "\r\n", 2);
@@ -768,7 +780,8 @@ void statusbar(struct dynamicbuff *db)
 	cons_dynamic(db, status, leng);
 	while (leng < editor.column) 
 	{
-		if (editor.column - leng == renderleng) {
+		if (editor.column - leng == renderleng) 
+		{
 			cons_dynamic(db, renderstatus, renderleng);
 			break;
 		} else {
@@ -811,7 +824,6 @@ void screen_refresh()
 	snprintf(buffer, sizeof(buffer), "\x1b[%d;%dH", (editor.y_coor - editor.row_offset) + 1, 
 		(editor.rx_coor - editor.column_offset) + 1);
 	cons_dynamic(&db, buffer, strlen(buffer));
-	cons_dynamic(&db, "\x1b[H", 3);
 	// Reset Mode
 	cons_dynamic(&db, "\x1b[?25h", 6);
 	write(STDOUT_FILENO, db.buff, db.leng);
@@ -890,20 +902,18 @@ char *userprompt(char *prompt, void (*func)(char *, int))
 
 void cursormovement_editor(int keys)
 {
-	editor_row *currow = (editor.rowcount <= editor.y_coor) ? NULL : &editor.rows[editor.y_coor];
-	int boundcheck;
+	editor_row *currow = (editor.y_coor >= editor.rowcount) ? NULL : &editor.rows[editor.y_coor];
 	switch (keys) 
 	{
-		case UP_ARROW:
-		boundcheck = 0;
-		if (editor.y_coor != boundcheck)
+		case UP:
+		if (editor.y_coor != 0)
 		{
 			editor.y_coor--;				
 		}
 		break;
-		case LEFT_ARROW:
-		boundcheck = 0;
-		if (editor.x_coor != boundcheck)
+
+		case LEFT:
+		if (editor.x_coor != 0)
 		{
 			editor.x_coor--;			
 		} 
@@ -913,15 +923,15 @@ void cursormovement_editor(int keys)
 			editor.x_coor = editor.rows[editor.y_coor].size;
 		}
 		break;
-		case DOWN_ARROW:
-		boundcheck = editor.row - 1;
+
+		case DOWN:
 		if (editor.y_coor < editor.rowcount)
 		{
 			editor.y_coor++;			
 		}
 		break;
-		case RIGHT_ARROW:
-		boundcheck = editor.column - 1;
+
+		case RIGHT:
 		if (currow && editor.x_coor < currow->size)
 		{
 			editor.x_coor++;
@@ -935,7 +945,8 @@ void cursormovement_editor(int keys)
 	}
 	currow = (editor.y_coor >= editor.rowcount) ? NULL : &editor.rows[editor.y_coor];
 	int rowlen = currow ? currow->size : 0;
-	if (editor.x_coor > rowlen) {
+	if (editor.x_coor > rowlen)
+	{
 		editor.x_coor = rowlen;
 	}
 }
@@ -944,12 +955,13 @@ void cursormovement_editor(int keys)
 void process_editor() 
 {  
 	int ch = read_editor();
-	int quits = QUIT_COUNT;
-	switch (ch) {
+	static int quits = QUIT_COUNT;
+	switch (ch) 
+	{
 		case CTRL_KEY('q'):
 		if (editor.modified && quits > 0) 
 		{
-			setstatus("Unsaved, %s Changes. Press Ctrl-Q %d more times to quit.", editor.modified, quits);
+			setstatus("Unsaved, %d Changes. Press Ctrl-Q again to Quit", editor.modified);
 			quits--;
 			return;
 		}
@@ -957,39 +969,39 @@ void process_editor()
 		esc_cursor();
 		exit(0);
 		break;
+
 		case CTRL_KEY('s'):
 		save();
 		break;
-		case CTRL_KEY('h'):
-		break;
+
 		case CTRL_KEY('l'):
-		break;
+
 		case CTRL_KEY('f'):
 		search();
-		break;		
+		break;
+
 		case '\r':
 		insertendline();
-		break;    
+		break; 
+
 		case '\x1b':
 		break;
-		case UP_ARROW:
-		break;
-		case LEFT_ARROW:
-		break;
-		case DOWN_ARROW:
-		break;
-		case RIGHT_ARROW:
+
+		case UP:
+		case LEFT:
+		case DOWN:
+		case RIGHT:
 		cursormovement_editor(ch);
 		break;
-		case UP_PAGE:
-		break;
-		case DOWN_PAGE:
+
+		case PAGE_UP:		
+		case PAGE_DOWN:
 		{       
-			if (ch == UP_PAGE) 
+			if (ch == PAGE_UP) 
 			{
 				editor.y_coor = editor.row_offset;
 			} 
-			else if (ch == DOWN_PAGE) 
+			else if (ch == PAGE_DOWN) 
 			{
 				editor.y_coor = editor.row_offset + editor.row - 1;
 				if (editor.y_coor > editor.rowcount) 
@@ -999,27 +1011,31 @@ void process_editor()
 			}
 			int amunt = editor.row;
 			while (amunt--)
-				cursormovement_editor(ch == UP_PAGE ? UP_ARROW : DOWN_ARROW);
+				cursormovement_editor(ch == PAGE_UP ? UP : DOWN);
 		}
 		break;
+		
 		case HOME:
 		editor.x_coor = 0;
 		break;
+		
 		case END:      
 		if (editor.y_coor < editor.rowcount)
 		{
 			editor.x_coor = editor.rows[editor.y_coor].size;
 		}
 		break;
+		
 		case BACKSPACE:
-		break;
+		case CTRL_KEY('h'):
 		case DELETE:
 		if (ch == DELETE)
 		{
-			cursormovement_editor(RIGHT_ARROW);
+			cursormovement_editor(RIGHT);
 		}
 		deletechar();
 		break;
+		
 		default:
 		insertchar(ch);
 		break;
@@ -1041,7 +1057,7 @@ void start_editor()
 	editor.statmesg[0] = '\0';
 	editor.statmesg_time = 0;
 	editor.modified = 0;
-	if (editor_size(&editor.column, &editor.row) == -1)
+	if (editor_size(&editor.row, &editor.column) == -1)
 	{
 		kill("Editor Size");
 	}
