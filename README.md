@@ -1,3 +1,4 @@
+![titles](https://user-images.githubusercontent.com/34925349/62840262-9f30b900-bc65-11e9-8329-33c2723539ae.png)
 ## Getting Started 
 
 These instructions will get you a copy of the project up and running on your local machine.
@@ -15,7 +16,8 @@ Execute `make clean` to clean up the files created through compilation.
 ## Commands
 Run the executable n files or create files
 * CTRL-Q to quit 
-* CTRL-F to find text
+* CTRL-F to find text:
+![search](https://user-images.githubusercontent.com/34925349/62840261-9f30b900-bc65-11e9-9b7d-068e88ce22f4.png)
 * CTRL-S to save
 
 
