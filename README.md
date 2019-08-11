@@ -16,9 +16,10 @@ Execute `make clean` to clean up the files created through compilation.
 ## Commands
 Run the executable n files or create files
 * CTRL-Q to quit 
-<br /> 
 * CTRL-F to find text:
-<br /> 
+
+
+
 ![search](https://user-images.githubusercontent.com/34925349/62840261-9f30b900-bc65-11e9-9b7d-068e88ce22f4.png)
 * CTRL-S to save
 
