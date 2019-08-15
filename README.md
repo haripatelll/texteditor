@@ -1,4 +1,8 @@
 ![titles](https://user-images.githubusercontent.com/34925349/62840262-9f30b900-bc65-11e9-8329-33c2723539ae.png)
+## Information
+
+Text editor built in C.
+
 ## Getting Started 
 
 These instructions will get you a copy of the project up and running on your local machine.
